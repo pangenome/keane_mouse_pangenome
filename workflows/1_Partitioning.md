@@ -1,17 +1,19 @@
 # Assembly partitioning by chromosome
 
 ```shell
-mkdir -p /lizardfs/guarracino/keane_mouse_pangenome/partitioning
-cd /lizardfs/guarracino/keane_mouse_pangenome/partitioning
+DIR_BASE=/lizardfs/guarracino/keane_mouse_pangenome
+
+mkdir -p $DIR_BASE/partitioning
+cd $DIR_BASE/partitioning
 
 RUN_WFMASH=/home/guarracino/tools/wfmash/build/bin/wfmash-cb0ce952a9bec3f2c8c78b98679375e5275e05db
-REFERENCES_FASTA_GZ=/lizardfs/guarracino/keane_mouse_pangenome/assemblies/mm39.fasta.gz
+REFERENCES_FASTA_GZ=$DIR_BASE/assemblies/mm39.fasta.gz
 
-ls /lizardfs/guarracino/keane_mouse_pangenome/assemblies/*fasta.gz | grep mm39 -v | grep unplaced | while read FASTA_GZ; do
+ls $DIR_BASE/assemblies/*fasta.gz | grep mm39 -v | grep unplaced | while read FASTA_GZ; do
   HAPLOTYPE=$(basename $FASTA_GZ .fasta.gz | cut -f 1,2 -d '.');
   echo $HAPLOTYPE
 
-  PAF=/lizardfs/guarracino/keane_mouse_pangenome/partitioning/$HAPLOTYPE.vs.ref.paf
+  PAF=$DIR_BASE/partitioning/$HAPLOTYPE.vs.ref.paf
   sbatch -p workers -c 6 --wrap "$RUN_WFMASH -t 6 -m -N -s 50k -l 150k -p 90 -H 0.001 $REFERENCES_FASTA_GZ $FASTA_GZ > $PAF"
 done
 ```
@@ -19,13 +21,13 @@ done
 Collect unmapped contigs and remap them in split mode:
 
 ```shell
-ls /lizardfs/guarracino/keane_mouse_pangenome/assemblies/*fasta.gz | grep mm39 -v | grep unplaced | while read FASTA_GZ; do
+ls $DIR_BASE/assemblies/*fasta.gz | grep mm39 -v | grep unplaced | while read FASTA_GZ; do
   HAPLOTYPE=$(basename $FASTA_GZ .fasta.gz | cut -f 1,2 -d '.');
   echo $HAPLOTYPE
 
-  UNALIGNED=/lizardfs/guarracino/keane_mouse_pangenome/partitioning/$HAPLOTYPE.unaligned
+  UNALIGNED=$DIR_BASE/partitioning/$HAPLOTYPE.unaligned
   
-  PAF=/lizardfs/guarracino/keane_mouse_pangenome/partitioning/$HAPLOTYPE.vs.ref.paf
+  PAF=$DIR_BASE/partitioning/$HAPLOTYPE.vs.ref.paf
   comm -23 <(cut -f 1 $FASTA_GZ.fai | sort) <(cut -f 1 $PAF | sort) > $UNALIGNED.txt
   if [[ $(wc -l $UNALIGNED.txt | cut -f 1 -d\ ) != 0 ]];
   then
