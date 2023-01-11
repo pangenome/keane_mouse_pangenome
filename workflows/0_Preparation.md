@@ -64,8 +64,6 @@ cd ..
 ```shell
 mkdir -p /lizardfs/guarracino/keane_mouse_pangenome/assemblies
 
-# TODO: to upload the REL-2205-Assembly.urls.txt file
-
 sbatch -p workers -c 48 --wrap "cd /lizardfs/guarracino/keane_mouse_pangenome/assemblies; (echo https://hgdownload.soe.ucsc.edu/goldenPath/mm39/bigZips/mm39.fa.gz; cat ../data/REL-2205-Assembly.urls.txt) | parallel -j 4 'wget -q {} && echo got {}'"
 
 # Apply PanSN-spec to the mm39 reference. The assemblies already follow PanSN-spec.
