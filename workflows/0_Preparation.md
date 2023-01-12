@@ -1,6 +1,12 @@
 # Preparation
 
-## PGGB
+Variables:
+
+```shell
+DIR_BASE=/lizardfs/guarracino/keane_mouse_pangenome
+```
+
+## Tools
 
 ```shell
 mkdir -p ~/tools/
@@ -62,8 +68,6 @@ cd ..
 ## Assemblies
 
 ```shell
-DIR_BASE=/lizardfs/guarracino/keane_mouse_pangenome
-
 mkdir -p $DIR_BASE/assemblies
 
 sbatch -p workers -c 48 --wrap "cd $DIR_BASE/assemblies; (echo https://hgdownload.soe.ucsc.edu/goldenPath/mm39/bigZips/mm39.fa.gz; cat ../data/REL-2205-Assembly.urls.txt) | parallel -j 4 'wget -q {} && echo got {}'"

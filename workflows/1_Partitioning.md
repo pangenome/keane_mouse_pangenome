@@ -1,12 +1,19 @@
-# Assembly partitioning by chromosome
+# Partitioning
+
+
+Variables:
 
 ```shell
 DIR_BASE=/lizardfs/guarracino/keane_mouse_pangenome
+RUN_WFMASH=/home/guarracino/tools/wfmash/build/bin/wfmash-cb0ce952a9bec3f2c8c78b98679375e5275e05db
+```
 
+## Partitioning by chromosome
+
+```shell
 mkdir -p $DIR_BASE/partitioning
 cd $DIR_BASE/partitioning
 
-RUN_WFMASH=/home/guarracino/tools/wfmash/build/bin/wfmash-cb0ce952a9bec3f2c8c78b98679375e5275e05db
 REFERENCES_FASTA_GZ=$DIR_BASE/assemblies/mm39.fasta.gz
 
 ls $DIR_BASE/assemblies/*fasta.gz | grep mm39 -v | grep unplaced | while read FASTA_GZ; do

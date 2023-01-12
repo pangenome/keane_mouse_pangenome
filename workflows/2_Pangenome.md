@@ -1,11 +1,17 @@
-# Pangenome building
+# Pangenome
 
-Run `pggb`:
+Variables:
 
 ```shell
 DIR_BASE=/lizardfs/guarracino/keane_mouse_pangenome
 RUN_PGGB=/home/guarracino/tools/pggb/pggb-288a395abf4a9f4755375633093f8ac3af59a081
+```
 
+## Pangenome building
+
+Run `pggb`:
+
+```shell
 mkdir -p $DIR_BASE/graphs/
 
 ( seq 1 19; echo X; echo Y; echo M ) | while read i; do
