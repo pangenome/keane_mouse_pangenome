@@ -63,6 +63,16 @@ sed 's,"$fmt" smoothxg,"$fmt" ~/tools/smoothxg/bin/smoothxg-c12f2d2685e566fe0486
 sed 's,"$fmt" odgi,"$fmt" ~/tools/odgi/bin/odgi-f483f9ed5a514a531fbd64833d49cd931ea59943,g' pggb -i
 mv pggb pggb-288a395abf4a9f4755375633093f8ac3af59a081
 cd ..
+
+git clone https://github.com/pangenome/vcfbub
+cd vcfbub
+git checkout master
+git pull
+git checkout 26a1f0cb216a423f8547c4ad0e0ce38cb9d324b9
+git submodule update --init --recursive
+cargo build --release
+mv target/release/vcfbub target/release/vcfbub-26a1f0cb216a423f8547c4ad0e0ce38cb9d324b9
+cd ..
 ```
 
 ## Assemblies
