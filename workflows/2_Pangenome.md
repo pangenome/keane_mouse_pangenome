@@ -19,7 +19,7 @@ mkdir -p $DIR_BASE/graphs/
 cd $DIR_BASE/graphs/
 
 ( seq 1 19; echo X; echo Y) | while read i; do
-    sbatch -p workers -c 48 --job-name mice --wrap "hostname; $RUN_PGGB -i $DIR_BASE/partitioning/chr$i.ref+pan.fa.gz -p 95 -s 50000 -n 18 -o $DIR_BASE/graphs/chr$i.ref+pan.p95 -V mm39:# -D /scratch;"
+    sbatch -p workers -x octopus03,octopus11 -c 48 --job-name mice --wrap "hostname; $RUN_PGGB -i $DIR_BASE/partitioning/chr$i.ref+pan.fa.gz -p 95 -s 50000 -n 18 -o $DIR_BASE/graphs/chr$i.ref+pan.p95 -V mm39:# -D /scratch;"
 done
 
 # C57BL_6NJ assembly has 2 chrM's contigs (C57BL_6NJ#1#21 and C57BL_6NJ#1#MT)
@@ -57,6 +57,8 @@ ls */*.vcf.gz | grep chrM | while read v; do
     prefix=${v%.vcf.gz};
     bcftools annotate -x INFO/TYPE $prefix.decomposed.tmp.vcf  | awk '$5 != "."' | bgzip -@ 48 -c > $prefix.decomposed.vcf.gz
     #rm $prefix.decomposed.tmp.vcf
+
+    bcftools stats $prefix.decomposed.vcf.gz > $prefix.decomposed.vcf.gz.stats
 done
 ```
 
@@ -82,5 +84,27 @@ sbatch -p headnode -c 1 --job-name mice --wrap "hostname; zstd -12 $DIR_BASE/gra
 ls $DIR_BASE/graphs/*p95*/*.gfa | while read GFA; do
     echo $GFA
     zstd -12 $GFA
+done
+```
+
+Statistics:
+
+```
+cd $DIR_BASE/graphs/
+
+# Graphs
+echo -e "chromosome\tlength\tnodes\tedges\tpaths\tsteps" > graph.statistics.tsv
+(seq 1 19; echo X; echo Y; echo M) | while read i; do
+  $RUN_ODGI stats -i chr$i.ref+pan.p95/chr$i.ref+pan.fa.gz.7976304.417fcdf.4cea6f5.smooth.final.og -S | grep '^#' -v | awk -v OFS='\t' -v chr=chr$i '{print(chr,$0)}'
+done >> graph.statistics.tsv
+
+# Variants
+echo -e "sample\tchromosome\tnum.samples\tnum.records\tno.alts\tsnps\tmnps\tindels\tothers\tmultiallelic.sites\tmultiallelic.snp.sites" > variant.stats.tsv
+bcftools query -l chr1.ref+pan.p95/chr1.ref+pan.fa.gz.7976304.417fcdf.4cea6f5.smooth.final.mm39.decomposed.vcf.gz | while read SAMPLE; do
+    echo $SAMPLE
+
+    seq 1 19 | while read i; do
+        bcftools view -s $SAMPLE chr$i.ref+pan.p95/chr$i.ref+pan.fa.gz.7976304.417fcdf.4cea6f5.smooth.final.mm39.decomposed.vcf.gz | bcftools stats | grep '^SN' | cut -f 4 | paste - - - - - - - - - | awk -v OFS='\t' -v sample=$SAMPLE -v chr=chr$i '{print(sample,chr,$0)}';
+    done >> variant.stats.tsv
 done
 ```

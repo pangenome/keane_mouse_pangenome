@@ -130,3 +130,14 @@ LP_J#1#chr18_unloc_5        317819   97632960    60  61
 WSB_EiJ#1#chr4_unloc_1      169623   111149347   60  61
 chrM
 ```
+
+Statistics:
+
+```
+cd $DIR_BASE/partitioning
+
+echo -e "chromosome\tstrain\tnum.contigs" > assembly.statistics.tsv
+(seq 1 19; echo X; echo Y; echo M) | while read i; do
+  cut -f 1 chr$i.ref+pan.fa.gz.fai -d '#' | uniq -c | awk -v OFS='\t' -v chr=chr$i '{print(chr,$2,$1)}';
+done >> assembly.statistics.tsv
+```
