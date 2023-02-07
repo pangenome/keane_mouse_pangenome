@@ -89,7 +89,7 @@ done
 
 Statistics:
 
-```
+```shell
 cd $DIR_BASE/graphs/
 
 # Graphs
@@ -99,12 +99,21 @@ echo -e "chromosome\tlength\tnodes\tedges\tpaths\tsteps" > graph.statistics.tsv
 done >> graph.statistics.tsv
 
 # Variants
+REFERENCES_FASTA_GZ=$DIR_BASE/assemblies/mm39.fasta.gz
+
 echo -e "sample\tchromosome\tnum.samples\tnum.records\tno.alts\tsnps\tmnps\tindels\tothers\tmultiallelic.sites\tmultiallelic.snp.sites" > variant.stats.tsv
 bcftools query -l chr1.ref+pan.p95/chr1.ref+pan.fa.gz.7976304.417fcdf.4cea6f5.smooth.final.mm39.decomposed.vcf.gz | while read SAMPLE; do
     echo $SAMPLE
 
-    seq 1 19 | while read i; do
-        bcftools view -s $SAMPLE chr$i.ref+pan.p95/chr$i.ref+pan.fa.gz.7976304.417fcdf.4cea6f5.smooth.final.mm39.decomposed.vcf.gz | bcftools stats | grep '^SN' | cut -f 4 | paste - - - - - - - - - | awk -v OFS='\t' -v sample=$SAMPLE -v chr=chr$i '{print(sample,chr,$0)}';
-    done >> variant.stats.tsv
+    (seq 1 19; echo X; echo Y; echo M) | while read i; do
+        VCF=chr$i.ref+pan.p95*/chr*.ref+pan.fa.gz.*.smooth.final.mm39.decomposed.vcf.gz
+        echo $VCF
+        bcftools view -a -s ${SAMPLE} -Ou ${VCF} | \
+            bcftools norm -f ${REFERENCES_FASTA_GZ} -c s -m - -Ou | \
+            bcftools view -e 'GT="ref" | GT~"\."' -f 'PASS,.' -Ou | \
+            bcftools sort -T /scratch/bcftools-sort.XXXXXX -Ou | \
+            bcftools norm -d exact -Oz | \
+            bcftools stats | grep '^SN' | cut -f 4 | paste - - - - - - - - - | awk -v OFS='\t' -v sample=$SAMPLE -v chr=chr$i '{print(sample,chr,$0)}' >> variant.stats.tsv
+    done
 done
 ```

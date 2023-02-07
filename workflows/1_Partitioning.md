@@ -133,7 +133,7 @@ chrM
 
 Statistics:
 
-```
+```shell
 cd $DIR_BASE/partitioning
 
 echo -e "chromosome\tstrain\tnum.contigs" > assembly.statistics.tsv
