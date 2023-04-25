@@ -5,7 +5,7 @@ Variables:
 ```shell
 DIR_BASE=/lizardfs/guarracino/keane_mouse_pangenome
 RUN_PGGB=/home/guarracino/tools/pggb/pggb-288a395abf4a9f4755375633093f8ac3af59a081
-RUN_VCFBUB=/home/guarracino/tools/vcfbub/target/release/vcfbub-26a1f0cb216a423f8547c4ad0e0ce38cb9d324b9
+RUN_VCFBUB=/home/guarracino/tools/vcfbub/target/release/vcfbub-d92ae50da4926612f9bcf5d3ea8506a78a348734
 RUN_ODGI=/home/guarracino/tools/odgi/bin/odgi-f483f9ed5a514a531fbd64833d49cd931ea59943
 RUN_VCFWAVE=/gnu/store/hkbkw85gjvsyqvx9vv9bw0ynmad989ag-vcflib-1.0.3+a36dbe9-11/bin/vcfwave
 ```
@@ -45,14 +45,14 @@ ls */*.vcf.gz | while read v; do
     echo $v;
     prefix=${v%.vcf.gz};
 
-    sbatch -p workers -w octopus03,octopus11 -c 1 --job-name mice --wrap "hostname; $RUN_VCFBUB -l 0 -a 100000 --input $v | $RUN_VCFWAVE -I 1000 -t 1 > $prefix.decomposed.tmp.vcf"
+    sbatch -p workers -c 48 --job-name mice --wrap "hostname; $RUN_VCFBUB -l 0 -a 100000 --input $v | $RUN_VCFWAVE -I 1000 -t 48 > $prefix.decomposed.tmp.vcf"
 done
 ```
 
 Finish decomposition:
 
 ```shell
-ls */*.vcf.gz | grep chrM | while read v; do
+ls */*.vcf.gz | while read v; do
     echo $v;
     prefix=${v%.vcf.gz};
     bcftools annotate -x INFO/TYPE $prefix.decomposed.tmp.vcf  | awk '$5 != "."' | bgzip -@ 48 -c > $prefix.decomposed.vcf.gz
@@ -62,10 +62,12 @@ ls */*.vcf.gz | grep chrM | while read v; do
 done
 ```
 
-Merge all VCF files:
+Merge all VCF files, except chrY's one because it misses a few samples (AKR_J and NOD_ShiLtJ):
 
 ```shell
-bcftools concat $DIR_BASE/graphs/chr*.ref+pan.p95*/*.decomposed.vcf.gz | bcftools sort -T /scratch/bcftools.XXXXX | bgzip -@ 24 -c > chrALL.ref+pan.p95.decomposed.vcf.gz
+bcftools concat -f <(ls $DIR_BASE/graphs/chr*.ref+pan.p95*/*.decomposed.vcf.gz | grep -v chrY) | bcftools sort -T /scratch/bcftools.XXXXX | bgzip -@ 48 -c > chr1-19+X.ref+pan.p95.decomposed.vcf.gz
+
+#bcftools concat $DIR_BASE/graphs/chr*.ref+pan.p95*/*.decomposed.vcf.gz | bcftools sort -T /scratch/bcftools.XXXXX | bgzip -@ 48 -c > chrALL.ref+pan.p95.decomposed.vcf.gz
 ```
 
 Squeeze graphs:
@@ -73,7 +75,7 @@ Squeeze graphs:
 ```shell
 ls $DIR_BASE/graphs/*p95*/*.og | sort -k 1,1 -V > $DIR_BASE/graphs/graphs_to_squeeze.p95.txt
 
-sbatch -p headnode -c 1 --job-name mice --wrap "hostname; $RUN_ODGI squeeze -f $DIR_BASE/graphs/graphs_to_squeeze.p95.txt -o - -t 1 -P | $RUN_ODGI view -i - -g > $DIR_BASE/graphs/chrALL.ref+pan.p95.gfa"
+sbatch -p headnode -c 48 --job-name mice --wrap "hostname; cd /scratch; $RUN_ODGI squeeze -f $DIR_BASE/graphs/graphs_to_squeeze.p95.txt -o - -t 1 -P | $RUN_ODGI view -i - -g > chr1-19+XY.ref+pan.p95.gfa; zstd -12 chr1-19+XY.ref+pan.p95.gfa; mv chr1-19+XY.ref+pan.p95.gfa.zst $DIR_BASE/graphs/; rm chr1-19+XY.ref+pan.p95.gfa"
 ```
 
 Compress graphs:
