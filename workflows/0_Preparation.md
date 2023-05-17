@@ -14,54 +14,50 @@ cd ~/tools/
 
 git clone --recursive https://github.com/waveygang/wfmash
 cd wfmash
-git checkout master
-git pull
-git checkout cb0ce952a9bec3f2c8c78b98679375e5275e05db
-git submodule update --init --recursive
-cmake -H. -DCMAKE_BUILD_TYPE=Release -Bbuild && cmake --build build -- -j $(nproc)
-mv build/bin/wfmash build/bin/wfmash-cb0ce952a9bec3f2c8c78b98679375e5275e05db
+git checkout master && git pull && git submodule update --init --recursive
+git checkout 8ba3c53f327731ca515abd1ef32179f15acb9732
+cmake -H. -Bbuild && cmake --build build -- -j 48
+cp build/bin/wfmash build/bin/wfmash-8ba3c53f327731ca515abd1ef32179f15acb9732
 cd ..
 
-clone --recursive https://github.com/ekg/seqwish
+git clone --recursive https://github.com/ekg/seqwish.git
 cd seqwish
-git checkout master
-git pull
-git checkout f362f6f5ea89dbb6a0072a8b8ba215e663301d33
-git submodule update --init --recursive
-cmake -H. -DCMAKE_BUILD_TYPE=Release -DEXTRA_FLAGS='-march=native' -Bbuild && cmake --build build -- -j $(nproc)
-mv bin/seqwish bin/seqwish-f362f6f5ea89dbb6a0072a8b8ba215e663301d33
+git checkout master && git pull && git submodule update --init --recursive
+git checkout d9e7ab59e73258f57875f2a060437735a460475e
+rm -rf build/
+cmake -H. -Bbuild && cmake --build build -- -j 48
+cp bin/seqwish bin/seqwish-d9e7ab59e73258f57875f2a060437735a460475e
 cd ..
 
-git clone --recursive https://github.com/pangenome/smoothxg
+git clone --recursive https://github.com/pangenome/smoothxg.git
 cd smoothxg
-git checkout master
-git pull
-git checkout c12f2d2685e566fe04868fd4749e544eb5a6bc37
-git submodule update --init --recursive
-cmake -H. -DCMAKE_BUILD_TYPE=Release -Bbuild && cmake --build build -- -j $(nproc)
-mv bin/smoothxg bin/smoothxg-c12f2d2685e566fe04868fd4749e544eb5a6bc37
+git checkout master && git pull && git submodule update --init --recursive
+git checkout 956eb75644522bb2b96b4cca44b7bafa9cf02f4a
+rm -rf build/
+cmake -H. -Bbuild && cmake --build build -- -j 48
+cp bin/smoothxg bin/smoothxg-956eb75644522bb2b96b4cca44b7bafa9cf02f4a
 cd ..
 
 git clone --recursive https://github.com/pangenome/odgi.git
 cd odgi
-git checkout master
-git pull
-git checkout f483f9ed5a514a531fbd64833d49cd931ea59943
-git submodule update --init --recursive
+git checkout master && git pull && git submodule update --init --recursive
+git checkout 34f006f31c3f6b35a1eb8d58a4edb1c458583de3
+rm -rf build/
 cmake -H. -Bbuild && cmake --build build -- -j 48
-mv bin/odgi bin/odgi-f483f9ed5a514a531fbd64833d49cd931ea59943
+cp bin/odgi bin/odgi-34f006f31c3f6b35a1eb8d58a4edb1c458583de3
 cd ..
 
 git clone --recursive https://github.com/pangenome/pggb.git
 cd pggb
-git checkout master
-git pull
-git checkout 288a395abf4a9f4755375633093f8ac3af59a081
-sed 's,"$fmt" wfmash,"$fmt" ~/tools/wfmash/build/bin/wfmash-cb0ce952a9bec3f2c8c78b98679375e5275e05db,g' pggb -i
-sed 's,"$fmt" seqwish,"$fmt" ~/tools/seqwish/bin/seqwish-f362f6f5ea89dbb6a0072a8b8ba215e663301d33,g' pggb -i
-sed 's,"$fmt" smoothxg,"$fmt" ~/tools/smoothxg/bin/smoothxg-c12f2d2685e566fe04868fd4749e544eb5a6bc37,g' pggb -i
-sed 's,"$fmt" odgi,"$fmt" ~/tools/odgi/bin/odgi-f483f9ed5a514a531fbd64833d49cd931ea59943,g' pggb -i
-mv pggb pggb-288a395abf4a9f4755375633093f8ac3af59a081
+git checkout master && git pull && git submodule update --init --recursive
+git checkout de5303e24d3e5594a5a2c9bdeb49aba420b24b0c
+cp pggb pggb-x
+sed 's,"$fmt" wfmash,"$fmt" ~/tools/wfmash/build/bin/wfmash-8ba3c53f327731ca515abd1ef32179f15acb9732,g' pggb-x -i
+sed 's,$(wfmash,$(~/tools/wfmash/build/bin/wfmash-8ba3c53f327731ca515abd1ef32179f15acb9732,g' pggb-x -i
+sed 's,"$fmt" seqwish,"$fmt" ~/tools/seqwish/bin/seqwish-d9e7ab59e73258f57875f2a060437735a460475e,g' pggb-x -i
+sed 's,"$fmt" smoothxg,"$fmt" ~/tools/smoothxg/bin/smoothxg-956eb75644522bb2b96b4cca44b7bafa9cf02f4a,g' pggb-x -i
+sed 's,"$fmt" odgi,"$fmt" ~/tools/odgi/bin/odgi-34f006f31c3f6b35a1eb8d58a4edb1c458583de3,g' pggb -i
+mv pggb-x pggb-de5303e24d3e5594a5a2c9bdeb49aba420b24b0c
 cd ..
 
 git clone https://github.com/pangenome/vcfbub
