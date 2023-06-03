@@ -88,12 +88,36 @@ GFA=$DIR_BASE/graphs/chr1-19+XY.ref+pan.p95.gfa
 FASTA=$DIR_BASE/graphs/chr1-19+XY.ref+pan.p95.fa
 target_coverage=10
 
-sed '1d' $DIR_BASE/short_reads/accessions.tsv | grep -f <(head -n 14 ERR_to_consider.to_del.txt) | sed '1d' | while read -r STRAIN ACC; do
+sed '1d' $DIR_BASE/short_reads/accessions.tsv | grep -f <(tail -n 16 ERR_to_consider.to_del.txt) | sed '1d' | while read -r STRAIN ACC; do
     STRAIN=$(echo $STRAIN | tr '/' '_')
     echo $STRAIN $ACC;
     r1=$DIR_BASE/short_reads/${ACC}_1.cov${target_coverage}X.fastq.gz;
     r2=$DIR_BASE/short_reads/${ACC}_2.cov${target_coverage}X.fastq.gz;
 
-    sbatch -p workers -x octopus07 -c 48 --job-name mice --wrap "hostname; cd /scratch; \time -v bwa mem -t 48 $FASTA $r1 $r2 -m 5 > $STRAIN.cov${target_coverage}X.sam; \time -v samtools view -b $STRAIN.cov${target_coverage}X.sam -@ 48 > $STRAIN.cov${target_coverage}X.bam; pigz -9 $STRAIN.cov${target_coverage}X.sam; \time -v gfainject --gfa $GFA --bam $STRAIN.cov${target_coverage}X.bam > $STRAIN.cov${target_coverage}X.gfainject.gaf; \time -v gafpack --graph $GFA --alignments $STRAIN.cov${target_coverage}X.gfainject.gaf > $STRAIN.cov${target_coverage}X.pack; pigz -9 $STRAIN.cov${target_coverage}X.gfainject.gaf; pigz ; mv $STRAIN.cov${target_coverage}X.* $DIR_BASE/short_reads/alignments/"
+    sbatch -p workers -x octopus07 -c 48 --job-name mice --wrap "hostname; cd /scratch; \time -v bwa mem -t 48 $FASTA $r1 $r2 -m 5 > $STRAIN.cov${target_coverage}X.sam; \time -v samtools view -b $STRAIN.cov${target_coverage}X.sam -@ 48 > $STRAIN.cov${target_coverage}X.bam; pigz -9 $STRAIN.cov${target_coverage}X.sam; \time -v gfainject --gfa $GFA --bam $STRAIN.cov${target_coverage}X.bam > $STRAIN.cov${target_coverage}X.gfainject.gaf; \time -v gafpack --graph $GFA --alignments $STRAIN.cov${target_coverage}X.gfainject.gaf -c > $STRAIN.cov${target_coverage}X.pack; pigz -9 $STRAIN.cov${target_coverage}X.gfainject.gaf; pigz ; mv $STRAIN.cov${target_coverage}X.* $DIR_BASE/short_reads/alignments/"
 done
+```
+
+Prepare the coverage matrix:
+
+```shell
+
+# Get samples
+grep '^##' *.pack -m 1 | cut -f 3 -d ':' | tr -d '[:blank:]' | rev | cut -f 1 -d '/' | rev | sed "s/.cov10X.gfainject.gaf//g" > samples.txt
+
+# Remove rows with the same value in all columns
+paste *.pack | sed '1,2d' | awk '{for(i=2; i<=NF; i++) {if ($i != $1) {print; break}}}' | pigz -9 > matrix.tsv.gz
+
+# if we want to remove something
+#grep '^##' `ls *.pack | grep -v 'CAST_EiJ\|JF1_MsJ\|LEWES_EiJ'` -m 1 | cut -f 3 -d ':' | tr -d '[:blank:]' | rev | cut -f 1 -d '/' | rev | sed "s/.cov10X.gfainject.gaf//g" > samples.txt
+#paste `ls *.pack | grep -v 'CAST_EiJ\|JF1_MsJ\|LEWES_EiJ'` | sed '1,2d' | awk '{for(i=2; i<=NF; i++) {if ($i != $1) {print; break}}}' | pigz -9 > matrix.tsv.gz
+
+# Subsample rows
+zcat matrix.tsv.gz | shuf -n 50000000 | pigz -9 > matrix.50M.tsv.gz
+```
+
+Compute PCA:
+
+```shell
+Rscript pca.R
 ```
