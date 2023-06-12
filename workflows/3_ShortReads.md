@@ -1,6 +1,5 @@
 # Short reads
 
-
 Variables:
 
 ```shell
@@ -51,17 +50,19 @@ target_coverage=10
 
 # Loop through .fastq.gz files
 ls *_1.fastq.gz -lht | rev | cut -f 1 -d ' ' | rev | cut -f 1 -d '_'  | while read ERR; do
-  # Determine read length (assuming all reads are the same length)
-  length=$(zcat ${ERR}_1.fastq.gz | head -n 2 | tail -n 1 | wc -c)
-  
-  # Count number of reads needed to get `target_coverage`
-  count=$(echo "$mm39_ref_size * $target_coverage / $length" | bc)
+  if [ ! -f ${ERR}_1.cov${target_coverage}X.fastq.gz ]; then
+    # Determine read length (assuming all reads are the same length)
+    length=$(zcat ${ERR}_1.fastq.gz | head -n 2 | tail -n 1 | wc -c)
 
-  # Write to output file
-  echo "$ERR\t$length\t$count"
+    # Count number of reads needed to get `target_coverage`
+    count=$(echo "$mm39_ref_size * $target_coverage / $length" | bc)
 
-  seqtk sample -s 17 ${ERR}_1.fastq.gz $count | pigz -9 -c > ${ERR}_1.cov${target_coverage}X.fastq.gz
-  seqtk sample -s 17 ${ERR}_2.fastq.gz $count | pigz -9 -c > ${ERR}_2.cov${target_coverage}X.fastq.gz
+    # Write to output file
+    echo "$ERR\t$length\t$count"
+
+    seqtk sample -s 17 ${ERR}_1.fastq.gz $count | pigz -9 -c > ${ERR}_1.cov${target_coverage}X.fastq.gz
+    seqtk sample -s 17 ${ERR}_2.fastq.gz $count | pigz -9 -c > ${ERR}_2.cov${target_coverage}X.fastq.gz
+  fi
 done
 ```
 
@@ -88,13 +89,16 @@ GFA=$DIR_BASE/graphs/chr1-19+XY.ref+pan.p95.gfa
 FASTA=$DIR_BASE/graphs/chr1-19+XY.ref+pan.p95.fa
 target_coverage=10
 
-sed '1d' $DIR_BASE/short_reads/accessions.tsv | grep -f <(tail -n 16 ERR_to_consider.to_del.txt) | sed '1d' | while read -r STRAIN ACC; do
-    STRAIN=$(echo $STRAIN | tr '/' '_')
+sed '1d' $DIR_BASE/short_reads/accessions.tsv | while read -r STRAIN ACC; do
+  STRAIN=$(echo $STRAIN | tr '/' '_')
+  PACK=$DIR_BASE/short_reads/alignments/$STRAIN.cov${target_coverage}X.pack
+  if [ ! -f $PACK ]; then
     echo $STRAIN $ACC;
     r1=$DIR_BASE/short_reads/${ACC}_1.cov${target_coverage}X.fastq.gz;
     r2=$DIR_BASE/short_reads/${ACC}_2.cov${target_coverage}X.fastq.gz;
 
     sbatch -p workers -x octopus07 -c 48 --job-name mice --wrap "hostname; cd /scratch; \time -v bwa mem -t 48 $FASTA $r1 $r2 -m 5 > $STRAIN.cov${target_coverage}X.sam; \time -v samtools view -b $STRAIN.cov${target_coverage}X.sam -@ 48 > $STRAIN.cov${target_coverage}X.bam; pigz -9 $STRAIN.cov${target_coverage}X.sam; \time -v gfainject --gfa $GFA --bam $STRAIN.cov${target_coverage}X.bam > $STRAIN.cov${target_coverage}X.gfainject.gaf; \time -v gafpack --graph $GFA --alignments $STRAIN.cov${target_coverage}X.gfainject.gaf -c > $STRAIN.cov${target_coverage}X.pack; pigz -9 $STRAIN.cov${target_coverage}X.gfainject.gaf; pigz ; mv $STRAIN.cov${target_coverage}X.* $DIR_BASE/short_reads/alignments/"
+  fi
 done
 ```
 
