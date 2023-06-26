@@ -27,7 +27,7 @@ principal_components_df <- data.frame(principal_components[, 1:2]) %>%
   mutate(Sample = sample_names$V1)
 
 # Write the data frame to a CSV file
-write.csv(principal_components_df, paste0(file_path, "pc_1to2.csv"), row.names = FALSE)
+write.csv(principal_components_df, paste0(file_path, ".pc_1to2.csv"), row.names = FALSE)
 # When you want to read the data back into R:
 #principal_components_df <- read.csv(paste0(file_path, "pc_1to2.csv"))
 
@@ -41,4 +41,4 @@ p <- ggplot(principal_components_df, aes(x = X1, y = X2, label = Sample)) +
   expand_limits(x = c(min(principal_components_df$X1), max(principal_components_df$X1)), 
                 y = c(min(principal_components_df$X2), max(principal_components_df$X2))) # Use expand_limits to ensure all labels fit in the plot
 
-ggsave(paste0(file_path, "pc_1to2.pdf"), width = 20, height = 12, plot = p)
+ggsave(paste0(file_path, ".pc_1to2.pdf"), width = 20, height = 12, plot = p)
