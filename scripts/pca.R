@@ -29,7 +29,7 @@ principal_components_df <- data.frame(principal_components[, 1:2]) %>%
 # Write the data frame to a CSV file
 write.csv(principal_components_df, paste0(file_path, ".pc_1to2.csv"), row.names = FALSE)
 # When you want to read the data back into R:
-#principal_components_df <- read.csv(paste0(file_path, "pc_1to2.csv"))
+#principal_components_df <- read.csv(paste0(file_path, ".pc_1to2.csv"))
 
 # Plot the first two principal components using ggplot2
 p <- ggplot(principal_components_df, aes(x = X1, y = X2, label = Sample)) +
