@@ -43,7 +43,7 @@ cat $DIR_BASE/data/loci_of_interest.bed | while read -r chrom start end; do
     bgzip -f -@ 48 -l 9 $DIR_BASE/pangenome/loci_of_interest/$name.contigs.fa && samtools faidx $DIR_BASE/pangenome/loci_of_interest/$name.contigs.fa.gz
     rm $DIR_BASE/pangenome/loci_of_interest/$name.contigs.txt
 
-    sbatch -c 48 -p workers --job-name pggb-$name --wrap "$PGGB -i $DIR_BASE/pangenome/loci_of_interest/$name.contigs.fa.gz -o $DIR_BASE/pangenome/loci_of_interest/pggb.$name -t 48 -D /scratch/$name"
+    sbatch -c 48 -p workers --job-name pggb-$name --wrap "$PGGB -i $DIR_BASE/pangenome/loci_of_interest/$name.contigs.fa.gz -o $DIR_BASE/pangenome/loci_of_interest/pggb.$name -s 10k -p 95 -t 48 -D /scratch/$name"
 done
 
 cat $DIR_BASE/data/loci_of_interest.bed | while read -r chrom start end; do
