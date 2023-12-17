@@ -16,9 +16,9 @@ cd ~/tools/
 git clone --recursive https://github.com/waveygang/wfmash
 cd wfmash
 git checkout main && git pull && git submodule update --init --recursive
-git checkout 637f8ce1ebe5a928f664bd5e3dbf68476e02ca9a
+git checkout 0b191bb84ffdfd257354c1aa82a7f1e13dc536d0
 cmake -H. -Bbuild && cmake --build build -- -j 48
-cp build/bin/wfmash build/bin/wfmash-637f8ce1ebe5a928f664bd5e3dbf68476e02ca9a
+cp build/bin/wfmash build/bin/wfmash-0b191bb84ffdfd257354c1aa82a7f1e13dc536d0
 cd ..
 
 git clone --recursive https://github.com/ekg/seqwish.git
@@ -59,26 +59,26 @@ cd ..
 git clone --recursive https://github.com/pangenome/pggb.git
 cd pggb
 git checkout master && git pull && git submodule update --init --recursive
-git checkout 450d8d94a98aaa170ff19e402a6b7831a8dd6a01
+git checkout 13482bd06359a7ad8e3d3e0dd6eb6d9399f26046
 cp pggb pggb-x
-sed 's,"$fmt" wfmash,"$fmt" ~/tools/wfmash/build/bin/wfmash-637f8ce1ebe5a928f664bd5e3dbf68476e02ca9a,g' pggb-x -i
-sed 's,$(wfmash,$(~/tools/wfmash/build/bin/wfmash-637f8ce1ebe5a928f664bd5e3dbf68476e02ca9a,g' pggb-x -i
+sed 's,"$fmt" wfmash,"$fmt" ~/tools/wfmash/build/bin/wfmash-0b191bb84ffdfd257354c1aa82a7f1e13dc536d0,g' pggb-x -i
+sed 's,$(wfmash,$(~/tools/wfmash/build/bin/wfmash-0b191bb84ffdfd257354c1aa82a7f1e13dc536d0,g' pggb-x -i
 sed 's,"$fmt" seqwish,"$fmt" ~/tools/seqwish/bin/seqwish-f44b402f0c2e02988d431d9b2e5eba9727cf93a9,g' pggb-x -i
 sed 's,"$fmt" smoothxg,"$fmt" ~/tools/smoothxg/bin/smoothxg-ae949a1053fb3d7c7fb7bdf358aefcbcbd8073a4,g' pggb-x -i
 sed 's,"$fmt" odgi,"$fmt" ~/tools/odgi/bin/odgi-861b1c04f5622c5bb916a161c1abe812c213f1a5,g' pggb-x -i
 sed 's,"$fmt" gfaffix,"$fmt" ~/tools/GFAffix/target/release/gfaffix-d630eb7d9827340f5f292e57cb3cb5e31e6f86f0,g' pggb-x -i
-mv pggb-x pggb-450d8d94a98aaa170ff19e402a6b7831a8dd6a01
+mv pggb-x pggb-13482bd06359a7ad8e3d3e0dd6eb6d9399f26046
 cp partition-before-pggb partition-before-pggb-x
-sed 's,"$fmt" wfmash,"$fmt" ~/tools/wfmash/build/bin/wfmash-637f8ce1ebe5a928f664bd5e3dbf68476e02ca9a,g' partition-before-pggb-x -i
-sed 's,$(wfmash,$(~/tools/wfmash/build/bin/wfmash-637f8ce1ebe5a928f664bd5e3dbf68476e02ca9a,g' partition-before-pggb-x -i
+sed 's,"$fmt" wfmash,"$fmt" ~/tools/wfmash/build/bin/wfmash-0b191bb84ffdfd257354c1aa82a7f1e13dc536d0,g' partition-before-pggb-x -i
+sed 's,$(wfmash,$(~/tools/wfmash/build/bin/wfmash-0b191bb84ffdfd257354c1aa82a7f1e13dc536d0,g' partition-before-pggb-x -i
 sed 's,"$fmt" seqwish,"$fmt" ~/tools/seqwish/bin/seqwish-f44b402f0c2e02988d431d9b2e5eba9727cf93a9,g' partition-before-pggb-x -i
 sed 's,"$fmt" smoothxg,"$fmt" ~/tools/smoothxg/bin/smoothxg-ae949a1053fb3d7c7fb7bdf358aefcbcbd8073a4,g' partition-before-pggb-x -i
 sed 's,"$fmt" odgi,"$fmt" ~/tools/odgi/bin/odgi-861b1c04f5622c5bb916a161c1abe812c213f1a5,g' partition-before-pggb-x -i
 sed 's,"$fmt" gfaffix,"$fmt" ~/tools/GFAffix/target/release/gfaffix-d630eb7d9827340f5f292e57cb3cb5e31e6f86f0,g' partition-before-pggb-x -i
-mv partition-before-pggb-x partition-before-pggb-450d8d94a98aaa170ff19e402a6b7831a8dd6a01
+mv partition-before-pggb-x partition-before-pggb-13482bd06359a7ad8e3d3e0dd6eb6d9399f26046
 cd ..
 
-wget -c https://github.com/vgteam/vg/releases/download/v1.52.0/vg
+wget -c https://github.com/vgteam/vg/releases/download/v1.53.0/vg
 chmod +x vg
 
 git clone --recursice https://github.com/pangenome/vcfbub.git
@@ -121,5 +121,5 @@ done
 
 zcat mm39.fa.gz | sed 's/>chr/>mm39#1#chr/g' | bgzip -@ 48 -c > mm39.fasta.gz
 samtools faidx mm39.fasta.gz
-rm mm39.fa.gz
+rm mm39.fa.gz *fna
 ```
