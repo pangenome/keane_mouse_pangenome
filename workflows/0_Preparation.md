@@ -59,7 +59,7 @@ cd ..
 git clone --recursive https://github.com/pangenome/pggb.git
 cd pggb
 git checkout master && git pull && git submodule update --init --recursive
-git checkout 13482bd06359a7ad8e3d3e0dd6eb6d9399f26046
+git checkout 8131f28c3085a241b88a4a4de2ae3b64c2ddaaf0
 cp pggb pggb-x
 sed 's,"$fmt" wfmash,"$fmt" ~/tools/wfmash/build/bin/wfmash-0b191bb84ffdfd257354c1aa82a7f1e13dc536d0,g' pggb-x -i
 sed 's,$(wfmash,$(~/tools/wfmash/build/bin/wfmash-0b191bb84ffdfd257354c1aa82a7f1e13dc536d0,g' pggb-x -i
@@ -67,7 +67,8 @@ sed 's,"$fmt" seqwish,"$fmt" ~/tools/seqwish/bin/seqwish-f44b402f0c2e02988d431d9
 sed 's,"$fmt" smoothxg,"$fmt" ~/tools/smoothxg/bin/smoothxg-ae949a1053fb3d7c7fb7bdf358aefcbcbd8073a4,g' pggb-x -i
 sed 's,"$fmt" odgi,"$fmt" ~/tools/odgi/bin/odgi-861b1c04f5622c5bb916a161c1abe812c213f1a5,g' pggb-x -i
 sed 's,"$fmt" gfaffix,"$fmt" ~/tools/GFAffix/target/release/gfaffix-d630eb7d9827340f5f292e57cb3cb5e31e6f86f0,g' pggb-x -i
-mv pggb-x pggb-13482bd06359a7ad8e3d3e0dd6eb6d9399f26046
+sed 's,"$fmt" vcfwave,"$fmt" ~/tools/vcflib/build/vcfwave-7c1a31a430d339adcb9a0c2fd3fd02d3b30e3549,g' pggb-x -i
+mv pggb-x pggb-8131f28c3085a241b88a4a4de2ae3b64c2ddaaf0
 cp partition-before-pggb partition-before-pggb-x
 sed 's,"$fmt" wfmash,"$fmt" ~/tools/wfmash/build/bin/wfmash-0b191bb84ffdfd257354c1aa82a7f1e13dc536d0,g' partition-before-pggb-x -i
 sed 's,$(wfmash,$(~/tools/wfmash/build/bin/wfmash-0b191bb84ffdfd257354c1aa82a7f1e13dc536d0,g' partition-before-pggb-x -i
@@ -75,7 +76,8 @@ sed 's,"$fmt" seqwish,"$fmt" ~/tools/seqwish/bin/seqwish-f44b402f0c2e02988d431d9
 sed 's,"$fmt" smoothxg,"$fmt" ~/tools/smoothxg/bin/smoothxg-ae949a1053fb3d7c7fb7bdf358aefcbcbd8073a4,g' partition-before-pggb-x -i
 sed 's,"$fmt" odgi,"$fmt" ~/tools/odgi/bin/odgi-861b1c04f5622c5bb916a161c1abe812c213f1a5,g' partition-before-pggb-x -i
 sed 's,"$fmt" gfaffix,"$fmt" ~/tools/GFAffix/target/release/gfaffix-d630eb7d9827340f5f292e57cb3cb5e31e6f86f0,g' partition-before-pggb-x -i
-mv partition-before-pggb-x partition-before-pggb-13482bd06359a7ad8e3d3e0dd6eb6d9399f26046
+sed 's,"$fmt" vcfwave,"$fmt" ~/tools/vcflib/build/vcfwave-7c1a31a430d339adcb9a0c2fd3fd02d3b30e3549,g' partition-before-pggb-x -i
+mv partition-before-pggb-x partition-before-pggb-8131f28c3085a241b88a4a4de2ae3b64c2ddaaf0
 cd ..
 
 wget -c https://github.com/vgteam/vg/releases/download/v1.53.0/vg
